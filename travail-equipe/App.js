@@ -7,6 +7,10 @@ export default function App() {
   const [data, setData] = useState([]);
   const [idx, setIdx] = useState(0);
   const [idxSelected, setIdxSelected] = useState(0);
+  const [session, setSession] = useState("");
+  const [nouCours, setNouCours] = useState([]);
+  const [info, setInfo] = useState("Aucun étudiant sélectionné");
+  const [msg, setMsg] = useState("Confirmez votre sélection");
 
  //Prend les students et le met dans le DATA
  const getStudents = () => {
@@ -19,11 +23,6 @@ export default function App() {
     getStudents();
   }, []);
 
-  const [session, setSession] = useState("");
-  const [nouCours, setNouCours] = useState([]);
-  const [info, setInfo] = useState("Aucun étudiant sélectionné");
-  const [msg, setMsg] = useState("Confirmez votre sélection");
-
   const idToName = (id) => {
     setMsg("Confirmez votre sélection");
     let idx = data.findIndex(it=>it.id_etudiant == id);
@@ -35,17 +34,22 @@ export default function App() {
       setInfo(data[0].nom);
     }
   };
-  const addCours = (cours) => {
-    setNouCours(cours);
-  };
-  //---------------------------
 
+  const addCours = (cours) => {
+    if (cours.length)
+      setNouCours(cours);
+  };
+  
   const register = () => {
-    let allCours = [...data[idxSelected].cours,nouCours];
-    console.log(allCours);
-    if (allCours.length < 5) { 
-      data[idxSelected] = {...data[idxSelected], cours:allCours};
+    if (nouCours.length && data[idxSelected].cours.length < 5) {
+      if (data[idxSelected]?.cours.indexOf(nouCours) == -1) {
+        let allCours = [...data[idxSelected].cours,nouCours];
+        //console.log(allCours);
+        data[idxSelected] = {...data[idxSelected], cours:allCours};
+      }
     }
+    setNouCours("");
+    
   }
 
   const afficher = () => {
@@ -72,7 +76,7 @@ export default function App() {
         <Text>Session:</Text>
         <TextInput style={{borderWidth:1, width:'98%'}} value={session} />
         <Text>Enregistrer élève au cours:</Text>
-        <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={addCours} />
+        <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={addCours} value={nouCours} />
         <Button style={styles.button} title="ENREGISTRER" onPress={register} />
         <Button style={styles.button} title="AFFICHER" onPress={afficher}/>
       </View>
