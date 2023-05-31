@@ -1,7 +1,7 @@
 import {useState} from 'react';
 import { Text, View, StyleSheet, TextInput, Button } from 'react-native';
 import Constants from 'expo-constants';
-import Header from './components/Header';
+import Header from './Header';
 
 
 let liste = [{id_etudiant:"00", nom:"Aucun seléctionné", session:"1", cours:[]}];
@@ -10,6 +10,9 @@ const register = () => {}
 const afficher = () => {}
 
 export default function App() {
+
+
+  
   const [msg, setMsg] = useState("Confirmez votre sélection");
 
   return (
@@ -17,7 +20,7 @@ export default function App() {
       <Header titre = "INSCRIPTION AUX COURS" couleurFond = "blue"/>
       <View style={styles.select}>
         <Text>Id:</Text>
-        <TextInput style={{borderWidth:1, padding:'8'}} />
+        <TextInput style={{borderWidth:1}} />
         <Text>{liste[0].nom}</Text>
         <Button title="SÉLECTIONNER UN ÉTUDIANT" onPress={()=>setMsg("Élève sélectionné")}/>
         <Text style={{color:'red'}}>{msg}</Text>
