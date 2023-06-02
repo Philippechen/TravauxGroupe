@@ -17,7 +17,7 @@ export default function App() {
   //fin translate
 
   const [data, setData] = useState([]);              //Json
-  const [idx, setIdx] = useState(0);                 //index de donné trouvé par Id, Le utilisateur ne le choisisse pas forcément
+  const [idx, setIdx] = useState(-1);                 //index de donné trouvé par Id, Le utilisateur ne le choisisse pas forcément
   const [idxSelected, setIdxSelected] = useState(0); //Index choisi
   const [texte, setTexte] = useState("00");          //Pour initializer TexteInput d'Id
   const [session, setSession] = useState("");        //Pour Afficher information de session
@@ -60,19 +60,31 @@ export default function App() {
   };
 
   const register = () => {
+    let allCours="";
     if (nouCours.length && data[idxSelected].cours.length < 5) {
       if (data[idxSelected]?.cours.indexOf(nouCours) == -1) {
-        let allCours = [...data[idxSelected].cours,nouCours];
-        //console.log(allCours);
-        data[idxSelected] = {...data[idxSelected], cours:allCours, session:session};
+        allCours = [...data[idxSelected].cours,nouCours];
       }
     }
+
+      if (Number(session)) {
+        if (allCours.length) {
+          data[idxSelected] = {...data[idxSelected], cours:allCours, session:session};
+        } else {
+          data[idxSelected] = {...data[idxSelected], session:session};
+        }
+      } else {
+        //Si session n'est pas numéro, l'ignorer
+        if (allCours.length) {
+          data[idxSelected] = {...data[idxSelected], cours:allCours};
+        } 
+      }
     setNouCours("");
   }
 
   const afficher = () => {
     //console.log(1);
-    let msg = `${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, ${translate.t("semester")} ${session}, ${translate.t("studentClass")}\n`;
+    let msg = `${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, ${translate.t("semester")} ${data[idxSelected].session}, ${translate.t("studentClass")}\n`;
     
     for (let i = 0; i < data[idxSelected].cours.length; i++) {
       if (i == (data[idxSelected].cours.length - 1))
@@ -94,7 +106,7 @@ export default function App() {
         <TextInput style={{borderWidth:1}} keyboardType="number-pad" onChangeText={idToName} value={texte} />
         <Text style={styles.font}>{info}</Text>
         <Pressable   style={styles.press}
-          onPress={()=>{setMsg(translate.t("studentSelected"));setIdxSelected(idx);}}>
+          onPress={()=>{if (idx>0) {setMsg(translate.t("studentSelected"));setIdxSelected(idx);}}}>
           <Text style={styles.pressText}>{translate.t("selectStudent")}</Text>
         </Pressable>
         <Text style={[styles.font, {color:'red'}]}>{msg}</Text>
