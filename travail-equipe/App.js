@@ -2,16 +2,30 @@ import React, { useEffect, useState } from "react";
 import { Text, View, StyleSheet, TextInput, Button, FlatList, Alert, Pressable} from 'react-native';
 import Constants from 'expo-constants';
 import Header from './Header';
+import * as Localization from 'expo-localization';
+import {I18n} from 'i18n-js';
+import trad from './traduction';
 
 export default function App() {
+  //Translate
+  const [traduction, setTraduction]= React.useState("fr");
+  const translate = new I18n(trad);
+  translate.enableFallback = true;
+  translate.defaultLocale = "fr";
+  translate.locale = Localization.locale;
+  
+  //fin translate
+
   const [data, setData] = useState([]);              //Json
   const [idx, setIdx] = useState(0);                 //index de donné trouvé par Id, Le utilisateur ne le choisisse pas forcément
   const [idxSelected, setIdxSelected] = useState(0); //Index choisi
   const [texte, setTexte] = useState("00");          //Pour initializer TexteInput d'Id
   const [session, setSession] = useState("");        //Pour Afficher information de session
   const [nouCours, setNouCours] = useState([]);      //Pour savoir le nom de nouvelle cours
-  const [info, setInfo] = useState("Aucun étudiant sélectionné");
-  const [msg, setMsg] = useState("Confirmez votre sélection");
+  const [info, setInfo] = useState(translate.t("noStudent"));
+  const [msg, setMsg] = useState(translate.t("confirmStudent"));
+  
+
 
  //Prend les students et le met dans le DATA
  const getStudents = () => {
@@ -27,7 +41,7 @@ export default function App() {
   //Trouver l'index de donné
   //Il n'est pas en ordre nécessairement, donc on ne peut pas utiliser id comme index
   const idToName = (id) => {
-    setMsg("Confirmez votre sélection");
+    setMsg(translate.t("confirmStudent"));
     setTexte(id);
     let idx = data.findIndex(it=>it.id_etudiant == id);
     if (idx > -1) {
@@ -41,69 +55,68 @@ export default function App() {
     }
   };
 
-  const changeSess = (sess) => {
-    if (sess)
-      setSession(sess);
-  };
-
   const addCours = (cours) => {
-    if (cours.length)
       setNouCours(cours);
   };
-  
+
   const register = () => {
     if (nouCours.length && data[idxSelected].cours.length < 5) {
       if (data[idxSelected]?.cours.indexOf(nouCours) == -1) {
         let allCours = [...data[idxSelected].cours,nouCours];
+        //console.log(allCours);
         data[idxSelected] = {...data[idxSelected], cours:allCours, session:session};
       }
     }
     setNouCours("");
   }
- 
+
   const afficher = () => {
-    let msg = `Soumis\n${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, session ${session} prend les cours:\n`;
+    //console.log(1);
+    let msg = `${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, ${translate.t("semester")} ${session}, ${translate.t("studentClass")}\n`;
+    
     for (let i = 0; i < data[idxSelected].cours.length; i++) {
       if (i == (data[idxSelected].cours.length - 1))
         msg += `    ${data[idxSelected].cours[i]}`
       else
         msg += `    ${data[idxSelected].cours[i]},\n`
     }
-    alert(msg);
+    //console.log(12);console.log(msg);
+    Alert.alert('Soumis',msg);
+    //console.log(123);
   }
-   
+
   return (
     <View style={styles.container}>
-      <Header titre = "INSCRIPTION AUX COURS" couleurFond = "blue"/>
+      <Header titre = {translate.t("headText")} couleurFond = "blue"/>
 
       <View style={styles.select}>
         <Text style={styles.font}>Id:</Text>
         <TextInput style={{borderWidth:1}} keyboardType="number-pad" onChangeText={idToName} value={texte} />
         <Text style={styles.font}>{info}</Text>
         <Pressable   style={styles.press}
-          onPress={()=>{if (info != "Aucun étudiant sélectionné") {setMsg("Élève sélectionné");setIdxSelected(idx);}}}>
-          <Text style={styles.pressText}>SÉLECTIONNER UN ÉTUDIANT</Text>
+          onPress={()=>{setMsg(translate.t("studentSelected"));setIdxSelected(idx);}}>
+          <Text style={styles.pressText}>{translate.t("selectStudent")}</Text>
         </Pressable>
         <Text style={[styles.font, {color:'red'}]}>{msg}</Text>
       </View>
 
       <View style={styles.cours}>
-        <Text style={styles.font} >Session:</Text>
-        <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={changeSess} value={session} />
-        <Text style={styles.font}>Enregistrer élève au cours:</Text>
+        <Text style={styles.font} >{translate.t("semester")}</Text>
+        <TextInput style={{borderWidth:1, width:'98%'}} keyboardType="number-pad" onChangeText={setSession} value={session} />
+        <Text style={styles.font}>{translate.t("registerStudent")}</Text>
         <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={addCours} value={nouCours} />
       </View>
 
       <View style={styles.buttonView}>
         <Pressable   style={styles.press}
           onPress={register}>
-          <Text  style={styles.pressText}>ENREGISTRER</Text>
+          <Text  style={styles.pressText}>{translate.t("register")}</Text>
         </Pressable>
       </View>
       <View style={styles.buttonView}>
         <Pressable   style={styles.press}
           onPress={afficher}>
-          <Text style={styles.pressText}>AFFICHER</Text>
+          <Text style={styles.pressText}>{translate.t("display")}</Text>
         </Pressable>
       </View>
     </View>
