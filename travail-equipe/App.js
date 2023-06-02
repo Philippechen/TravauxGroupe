@@ -35,6 +35,7 @@ export default function App() {
       setInfo(data[idx].nom);
       setSession(data[idx].session);
     } else {
+      setIdx(-1);
       setInfo(data[0].nom);
     }
   };
@@ -48,7 +49,6 @@ export default function App() {
     if (nouCours.length && data[idxSelected].cours.length < 5) {
       if (data[idxSelected]?.cours.indexOf(nouCours) == -1) {
         let allCours = [...data[idxSelected].cours,nouCours];
-        //console.log(allCours);
         data[idxSelected] = {...data[idxSelected], cours:allCours};
       }
     }
@@ -60,9 +60,9 @@ export default function App() {
     let msg = `Soumis\n${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, prend les cours:\n`;
     for (let i = 0; i < data[idxSelected].cours.length; i++) {
       if (i == (data[idxSelected].cours.length - 1))
-        msg += `${data[idxSelected].cours[i]}`
+        msg += `    ${data[idxSelected].cours[i]}`
       else
-        msg += `${data[idxSelected].cours[i]},\n`
+        msg += `    ${data[idxSelected].cours[i]},\n`
     }
     alert(msg);
   }
@@ -76,7 +76,7 @@ export default function App() {
         <TextInput style={{borderWidth:1}} keyboardType="number-pad" onChangeText={idToName} value={texte} />
         <Text style={styles.font}>{info}</Text>
         <Pressable   style={styles.press}
-          onPress={()=>{setMsg("Élève sélectionné");setIdxSelected(idx);}}>
+          onPress={()=>{if (idx >= 0) {setMsg("Élève sélectionné");setIdxSelected(idx);}}}>
           <Text style={styles.pressText}>SÉLECTIONNER UN ÉTUDIANT</Text>
         </Pressable>
         <Text style={[styles.font, {color:'red'}]}>{msg}</Text>
