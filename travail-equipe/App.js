@@ -36,8 +36,14 @@ export default function App() {
       setSession(data[idx].session);
     } else {
       setIdx(-1);
+      setIdxSelected(0);
       setInfo(data[0].nom);
     }
+  };
+
+  const changeSess = (sess) => {
+    if (sess)
+      setSession(sess);
   };
 
   const addCours = (cours) => {
@@ -49,15 +55,14 @@ export default function App() {
     if (nouCours.length && data[idxSelected].cours.length < 5) {
       if (data[idxSelected]?.cours.indexOf(nouCours) == -1) {
         let allCours = [...data[idxSelected].cours,nouCours];
-        data[idxSelected] = {...data[idxSelected], cours:allCours};
+        data[idxSelected] = {...data[idxSelected], cours:allCours, session:session};
       }
     }
     setNouCours("");
-    
   }
-
+ 
   const afficher = () => {
-    let msg = `Soumis\n${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, prend les cours:\n`;
+    let msg = `Soumis\n${data[idxSelected].nom}, id ${data[idxSelected].id_etudiant}, session ${session} prend les cours:\n`;
     for (let i = 0; i < data[idxSelected].cours.length; i++) {
       if (i == (data[idxSelected].cours.length - 1))
         msg += `    ${data[idxSelected].cours[i]}`
@@ -66,7 +71,7 @@ export default function App() {
     }
     alert(msg);
   }
-  
+   
   return (
     <View style={styles.container}>
       <Header titre = "INSCRIPTION AUX COURS" couleurFond = "blue"/>
@@ -76,7 +81,7 @@ export default function App() {
         <TextInput style={{borderWidth:1}} keyboardType="number-pad" onChangeText={idToName} value={texte} />
         <Text style={styles.font}>{info}</Text>
         <Pressable   style={styles.press}
-          onPress={()=>{if (idx >= 0) {setMsg("Élève sélectionné");setIdxSelected(idx);}}}>
+          onPress={()=>{if (info != "Aucun étudiant sélectionné") {setMsg("Élève sélectionné");setIdxSelected(idx);}}}>
           <Text style={styles.pressText}>SÉLECTIONNER UN ÉTUDIANT</Text>
         </Pressable>
         <Text style={[styles.font, {color:'red'}]}>{msg}</Text>
@@ -84,7 +89,7 @@ export default function App() {
 
       <View style={styles.cours}>
         <Text style={styles.font} >Session:</Text>
-        <TextInput style={{borderWidth:1, width:'98%'}} value={session} />
+        <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={changeSess} value={session} />
         <Text style={styles.font}>Enregistrer élève au cours:</Text>
         <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={addCours} value={nouCours} />
       </View>
