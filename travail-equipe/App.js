@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Text, View, StyleSheet, TextInput, Button, FlatList, Alert, Pressable} from 'react-native';
+import { Text, View, StyleSheet, TextInput, Button, FlatList, Alert, Pressable,TouchableOpacity} from 'react-native';
 import Constants from 'expo-constants';
 import Header from './Header';
 import * as Localization from 'expo-localization';
@@ -13,7 +13,7 @@ export default function App() {
   translate.enableFallback = true;
   translate.defaultLocale = "fr";
   translate.locale = Localization.locale;
-  
+  translate.locale= traduction; 
   //fin translate
 
   const [data, setData] = useState([]);              //Json
@@ -24,8 +24,15 @@ export default function App() {
   const [nouCours, setNouCours] = useState([]);      //Pour savoir le nom de nouvelle cours
   const [info, setInfo] = useState(translate.t("noStudent"));
   const [msg, setMsg] = useState(translate.t("confirmStudent"));
-  
+  const [darkmode, setDarkmode] = useState(true);
+  const [darkText, setDarkText] = useState("Dark");
 
+  //Couleurs
+  let colorBlackBlue= darkmode?"black":"cornflowerblue";
+  let colorHeader= darkmode?"black":"blue";
+  let colorGreyWhite= darkmode?"#878889":"mintcream";
+  let colorGreySky= darkmode?"#A3A9A9":"turquoise";
+  let colorWhiteBlack= darkmode?"white":"black";
 
  //Prend les students et le met dans le DATA
  const getStudents = () => {
@@ -96,16 +103,45 @@ export default function App() {
     Alert.alert('Soumis',msg);
     //console.log(123);
   }
+    const modifierLangue = ()=>{
+    if(traduction==="fr"){
+      setTraduction("en") 
+    }else{
+      setTraduction("fr") 
+    }
+  }
+      const modifierStyle = ()=>{
+    if(darkmode){
+      setDarkmode(false);
+      setDarkText("Clear");
+    }else{
+      setDarkmode(true);
+      setDarkText("Dark");
+    }
+  }
 
   return (
-    <View style={styles.container}>
-      <Header titre = {translate.t("headText")} couleurFond = "black"/>
-
-      <View style={styles.select}>
-        <Text style={styles.font}>Id:</Text>
+    <View style={[styles.container,{backgroundColor:colorGreyWhite}]}>
+      <Header titre = {translate.t("headText")} couleurFond = {colorHeader}/>
+    
+      <View style={[styles.select,{backgroundColor:colorGreySky, flexDirection:'row', justifyContent:"space-between", height:70}]}>
+        <TouchableOpacity 
+        activeOpacity={0.2}
+        onPress={modifierLangue}>
+        <Text style = {[styles.toText, styles.button3,{backgroundColor:colorBlackBlue}]}>{translate.t("lang")}</Text>
+      </TouchableOpacity> 
+       <TouchableOpacity
+        activeOpacity={0.2}
+        onPress={modifierStyle}>
+        <Text style = {[styles.toText, styles.button3,{backgroundColor:colorBlackBlue}]}>{darkText}</Text>
+      </TouchableOpacity> 
+      </View>
+    
+      <View style={[styles.select,{backgroundColor:colorGreySky}]}>
+      <Text style={styles.font}>Id:</Text>
         <TextInput style={{borderWidth:1}} keyboardType="number-pad" onChangeText={idToName} value={texte} />
         <Text style={styles.font}>{info}</Text>
-        <Pressable   style={styles.press}
+        <Pressable   style={[styles.press,{backgroundColor:colorBlackBlue}]}
           onPress={()=>{if (idx>0) {setMsg(translate.t("studentSelected"));setIdxSelected(idx);}}}>
           <Text style={styles.pressText}>{translate.t("selectStudent")}</Text>
         </Pressable>
@@ -113,20 +149,20 @@ export default function App() {
       </View>
 
       <View style={styles.cours}>
-        <Text style={styles.font} >{translate.t("semester")}</Text>
+        <Text style={[styles.font,{color:colorWhiteBlack}]} >{translate.t("semester")}</Text>
         <TextInput style={{borderWidth:1, width:'98%'}} keyboardType="number-pad" onChangeText={setSession} value={session} />
-        <Text style={styles.font}>{translate.t("registerStudent")}</Text>
+        <Text style={[styles.font,{color:colorWhiteBlack}]}>{translate.t("registerStudent")}</Text>
         <TextInput style={{borderWidth:1, width:'98%'}} onChangeText={addCours} value={nouCours} />
       </View>
 
       <View style={styles.buttonView}>
-        <Pressable   style={styles.press}
+        <Pressable   style={[styles.press,{backgroundColor:colorBlackBlue}]}
           onPress={register}>
           <Text  style={styles.pressText}>{translate.t("register")}</Text>
         </Pressable>
       </View>
       <View style={styles.buttonView}>
-        <Pressable   style={styles.press}
+        <Pressable   style={[styles.press,{backgroundColor:colorBlackBlue}]}
           onPress={afficher}>
           <Text style={styles.pressText}>{translate.t("display")}</Text>
         </Pressable>
@@ -138,9 +174,8 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     paddingTop: Constants.statusBarHeight,
-    backgroundColor: '#878889',
     padding: 8,
   },
   select:{
@@ -172,5 +207,19 @@ const styles = StyleSheet.create({
   font:{
     color:'white',
     fontWeight: 'bold'
+  },
+    toText:{
+    fontSize:18,
+    textAlign: "center",
+    borderWidth: 3,
+    borderRadius: 4,
+  },
+    button3:{
+    alignSelf: 'flex-end',
+    backgroundColor: 'black',
+    color: 'white',
+    paddingLeft: 1,
+    paddingRight: 1,
+    marginBottom:1,
   },
 });
